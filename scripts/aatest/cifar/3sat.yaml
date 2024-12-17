@@ -1,0 +1,46 @@
+defaults:
+  - _self_
+  - wandb: private.yaml
+  - override hydra/hydra_logging: disabled
+  - override hydra/job_logging: disabled
+
+# disable hydra outputs
+hydra:
+  output_subdir: null
+  run:
+    dir: .
+
+name: "3sat-cifar10-linear"
+pretrained_feature_extractor: "/home/trained_models/linear/0/3sat-cifar10-linear-0-ep=2.ckpt"
+backbone:
+  name: "resnet18"
+pretrain_method: "3sat"
+data:
+  dataset: cifar10 # change here for cifar100
+  train_path: "./datasets/cifar-10"
+  val_path: "./datasets/cifar-10"
+  format: "image_folder"
+  num_workers: 4
+optimizer:
+  name: "sgd"
+  batch_size: 256
+  lr: 0.1
+  weight_decay: 0
+scheduler:
+  name: "step"
+  lr_decay_steps: [10, 20]
+checkpoint:
+  enabled: True
+  dir: "trained_models"
+  frequency: 1
+auto_resume:
+  enabled: False
+finetune: False
+
+# overwrite PL stuff
+max_epochs: 25
+devices: [0]
+sync_batchnorm: True
+accelerator: "gpu"
+strategy: "ddp"
+precision: 16
